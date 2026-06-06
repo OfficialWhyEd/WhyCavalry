@@ -1,0 +1,52 @@
+{
+  "name": "whycavalry",
+  "version": "1.0.0",
+  "description": "WhyCavalry — AI chat per Cavalry motion graphics",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "build": "electron-builder",
+    "make-icon": "bash scripts/make-icon.sh",
+    "mcp": "node dist/index.js"
+  },
+  "build": {
+    "appId": "io.whycavalry.app",
+    "productName": "WhyCavalry",
+    "directories": {
+      "output": "dist-app"
+    },
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "icon": "build/icon.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "files": [
+      "electron-main.js",
+      "preload.js",
+      "renderer/**",
+      "assets/**",
+      "!src/**",
+      "!dist/**",
+      "!node_modules/.cache/**"
+    ]
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "@google/generative-ai": "^0.24.1",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhyCavalry</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="drop-overlay" id="dropOverlay">
+    <div class="drop-box">
+      <div class="drop-icon">⬇</div>
+      <div class="drop-text">Rilascia i file</div>
+    </div>
+  </div>
+
+  <!-- Titlebar -->
+  <div class="titlebar">
+    <div class="titlebar-left">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text">WhyCavalry</span>
+    </div>
+    <div class="status">
+      <span class="dot" id="statusDot"></span>
+      <span class="status-label" id="statusLabel">...</span>
+    </div>
+    <button class="settings-btn" id="settingsBtn" title="Impostazioni">⚙</button>
+  </div>
+
+  <!-- Main layout -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <button class="new-btn" id="newBtn">+ Nuova</button>
+      <div class="sessions-list" id="sessionsList"></div>
+    </div>
+
+    <!-- Chat area -->
+    <div class="chat">
+      <div class="messages" id="messages">
+        <div class="welcome" id="welcome">
+          <div class="welcome-glow"></div>
+          <div class="welcome-icon">⚡</div>
+          <h1>WhyCavalry</h1>
+          <p>Descrivi cosa vuoi creare.<br>Penso io al codice.</p>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="attachments" id="attachments"></div>
+        <div class="input-wrap">
+          <button class="attach-btn" id="attachBtn" title="Allega file (⌘O)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+            </svg>
+          </button>
+          <textarea id="input" placeholder="Crea una scena con..." rows="1"></textarea>
+          <button id="sendBtn" class="send-btn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+        <div class="hint">Invio per inviare · Shift+Invio per andare a capo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <span>Impostazioni</span>
+        <button class="modal-close" id="modalClose">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-group">
+          <label>Provider AI</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="provider" value="claude" id="providerClaude">
+              <span>Claude CLI <span class="badge">installato</span></span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="provider" value="gemini" id="providerGemini">
+              <span>Google AI Studio (Gemini)</span>
+            </label>
+          </div>
+        </div>
+        <div class="setting-group" id="geminiKeyGroup">
+          <label>API Key Google AI Studio</label>
+          <input type="password" id="geminiKey" placeholder="AIza...">
+          <div class="setting-hint">Ottieni la chiave su <span class="link">aistudio.google.com</span></div>
+        </div>
+        <button class="save-btn" id="saveSettings">Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
