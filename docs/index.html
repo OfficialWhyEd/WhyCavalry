@@ -71,20 +71,35 @@
     .btn-ghost { display: inline-flex; align-items: center; gap: .5rem; font-family: 'Satoshi',sans-serif; font-size: .95rem; font-weight: 600; padding: .75rem 1.5rem; border-radius: 8px; background: transparent; color: var(--sub); border: 1px solid rgba(255,255,255,.1); cursor: pointer; text-decoration: none; transition: border-color .2s, color .2s; }
     .btn-ghost:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
     .hero-visual { position: relative; z-index: 2; }
-    .icon-wrap { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 2rem; }
-    .icon-glow { position: absolute; width: 220px; height: 220px; background: radial-gradient(circle, rgba(0,180,204,.22) 0%, transparent 70%); animation: breathe 5s ease-in-out infinite; }
-    @keyframes breathe { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.2);opacity:1} }
-    .icon-img { height: 100px; position: relative; z-index: 1; filter: drop-shadow(0 0 18px rgba(0,180,204,.45)); border-radius: 22px; }
-    .terminal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; font-family: var(--mono); font-size: .8rem; box-shadow: 0 24px 48px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04); }
-    .terminal-bar { display: flex; align-items: center; gap: .5rem; padding: .7rem 1rem; background: rgba(255,255,255,.025); border-bottom: 1px solid var(--border); }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
     .dot-r{background:#ff5f57;} .dot-y{background:#febc2e;} .dot-g{background:#28c840;}
-    .terminal-title { font-family: 'Satoshi',sans-serif; font-size:.72rem; color: var(--dim); margin-left: auto; }
-    .terminal-body { padding: 1.25rem 1.5rem; line-height: 1.85; height: 18rem; overflow: hidden; }
-    .t-user { color: var(--teal); } .t-ai { color: #c8d8da; } .t-dim { color: var(--dim); } .t-sys { color: #28c840; }
-    .t-line { margin-bottom: .1rem; }
-    .cursor { display: inline-block; width: 7px; height: 1em; background: var(--teal); vertical-align: text-bottom; animation: blink 1.1s step-end infinite; margin-left: 1px; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── CAVALRY CANVAS ── */
+    .canvas-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 24px 48px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04); }
+    .canvas-topbar { display: flex; align-items: center; gap: .6rem; padding: .65rem 1rem; background: rgba(255,255,255,.025); border-bottom: 1px solid var(--border); }
+    .canvas-filename { font-family: var(--mono); font-size: .68rem; color: var(--dim); flex: 1; margin-left: .2rem; }
+    .canvas-running { display: flex; align-items: center; gap: .4rem; font-family: var(--mono); font-size: .6rem; letter-spacing: .1em; color: var(--teal); }
+    .canvas-run-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: blink-live 1.4s ease-in-out infinite; }
+    .canvas-stage { position: relative; height: 220px; overflow: hidden; background: #030a0b; }
+    .cav-shape { position: absolute; border-radius: 50%; }
+    .cav-c1 { width: 40px; height: 40px; background: rgba(0,180,204,.75); top: 50%; left: 50%; transform: translate(-50%,-50%); animation: cav-explode1 2.8s cubic-bezier(.2,1.4,.4,1) infinite; }
+    .cav-c2 { width: 28px; height: 28px; background: rgba(0,220,200,.6); top: 50%; left: 50%; transform: translate(-50%,-50%); animation: cav-explode2 2.8s cubic-bezier(.2,1.4,.4,1) .18s infinite; }
+    .cav-c3 { width: 20px; height: 20px; background: rgba(100,220,255,.5); top: 50%; left: 50%; transform: translate(-50%,-50%); animation: cav-explode3 2.8s cubic-bezier(.2,1.4,.4,1) .34s infinite; }
+    .cav-sq { width: 32px; height: 32px; background: transparent; border: 2px solid rgba(0,180,204,.5); border-radius: 6px; top: 30%; right: 20%; animation: cav-morph 3.5s ease-in-out infinite; }
+    .cav-tri { width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-bottom: 24px solid rgba(0,200,220,.35); border-radius: 0; background: none; bottom: 25%; left: 18%; animation: cav-spin 4s linear infinite; }
+    @keyframes cav-explode1 { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.8} 50%{transform:translate(calc(-50% + 60px),calc(-50% - 50px)) scale(.6);opacity:.3} }
+    @keyframes cav-explode2 { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.7} 50%{transform:translate(calc(-50% - 70px),calc(-50% + 30px)) scale(.5);opacity:.2} }
+    @keyframes cav-explode3 { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6} 50%{transform:translate(calc(-50% + 20px),calc(-50% + 65px)) scale(.4);opacity:.15} }
+    @keyframes cav-morph { 0%,100%{border-radius:6px;transform:rotate(0deg)} 50%{border-radius:50%;transform:rotate(180deg)} }
+    @keyframes cav-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    .cav-tag { position: absolute; font-family: var(--mono); font-size: .58rem; color: rgba(0,180,204,.5); letter-spacing: .06em; pointer-events: none; }
+    .canvas-timeline { padding: .75rem 1rem .8rem; border-top: 1px solid var(--border); }
+    .tl-bar { height: 3px; background: rgba(255,255,255,.06); border-radius: 2px; position: relative; overflow: visible; margin-bottom: .5rem; }
+    .tl-playhead { position: absolute; top: 50%; left: 0%; width: 2px; height: 10px; background: var(--teal); border-radius: 1px; transform: translateY(-50%); transition: left .016s linear; }
+    .tl-labels { display: flex; justify-content: space-between; font-family: var(--mono); font-size: .55rem; color: var(--dim); }
+    .canvas-prompt-wrap { margin-top: 1rem; }
+    .canvas-prompt-label { font-family: var(--mono); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin-bottom: .4rem; }
+    .canvas-prompt-text { font-family: var(--mono); font-size: .78rem; color: rgba(0,180,204,.8); background: rgba(0,180,204,.06); border: 1px solid rgba(0,180,204,.18); border-radius: 8px; padding: .65rem .9rem; line-height: 1.5; }
 
     section { padding: 7rem 3rem; }
     .section-label { font-family: var(--mono); font-size: .6rem; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-bottom: .85rem; }
@@ -240,24 +255,34 @@
     </div>
   </div>
   <div class="hero-visual enter-5">
-    <div class="icon-wrap">
-      <div class="icon-glow"></div>
-      <img class="icon-img" src="logo.png" alt="WhyCavalry" />
+    <div class="canvas-card">
+      <div class="canvas-topbar">
+        <div class="canvas-dots"><span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span></div>
+        <span class="canvas-filename">cavalry_scene.js</span>
+        <span class="canvas-running"><span class="canvas-run-dot"></span>RUNNING</span>
+      </div>
+      <div class="canvas-stage" id="cav-stage">
+        <div class="cav-shape cav-c1" id="cc1"></div>
+        <div class="cav-shape cav-c2" id="cc2"></div>
+        <div class="cav-shape cav-c3" id="cc3"></div>
+        <div class="cav-shape cav-sq" id="csq"></div>
+        <div class="cav-shape cav-tri" id="ctri"></div>
+        <div class="cav-trail" id="cav-trail"></div>
+        <span class="cav-tag" id="ctag1" style="top:18%;left:12%">// emitter_01</span>
+        <span class="cav-tag" id="ctag2" style="bottom:22%;right:10%">// morph_sq→circ</span>
+      </div>
+      <div class="canvas-timeline">
+        <div class="tl-bar">
+          <div class="tl-playhead" id="tl-head"></div>
+        </div>
+        <div class="tl-labels">
+          <span>0</span><span>30</span><span>60</span><span>90</span><span>120f</span>
+        </div>
+      </div>
     </div>
-    <div class="terminal">
-      <div class="terminal-bar">
-        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
-        <span class="terminal-title">whycavalry — ai bridge</span>
-      </div>
-      <div class="terminal-body" id="tb">
-        <div class="t-line t-dim">// cavalry open, scene: "Intro animation"</div>
-        <div class="t-line" style="margin-top:.5rem"><span class="t-user">you</span>&nbsp; "Cerchi che esplodono dal centro, colori pastello, loop"</div>
-        <div class="t-line t-dim">// claude-cli generating cavalry.js...</div>
-        <div class="t-line t-dim">// writing to ~/.whycavalry/script.js</div>
-        <div class="t-line t-dim">// osascript → Cavalry Scripts menu</div>
-        <div class="t-line" style="margin-top:.5rem"><span class="t-sys">cavalry</span> Script executed successfully</div>
-        <div class="t-line" style="margin-top:.5rem"><span class="t-ai">whycavalry</span> "Fatto in 2.1s. Vuoi velocizzare l'esplosione?<span class="cursor"></span>"</div>
-      </div>
+    <div class="canvas-prompt-wrap">
+      <div class="canvas-prompt-label">last prompt</div>
+      <div class="canvas-prompt-text" id="cav-prompt">"Circles exploding from center, pastel colors, spring easing"</div>
     </div>
   </div>
 </section>
@@ -459,24 +484,19 @@
   }, { threshold: 0.1 });
   document.querySelectorAll('.reveal, .prompts-grid, .philosophy-grid, .features-grid, .arch-stats').forEach(el => io.observe(el));
 
-  const scenes = [
-    [['dim','// cavalry open, scene active'],['user','"Cerchi che esplodono dal centro, pastello, loop"'],['dim','// claude-cli generating cavalry.js...'],['dim','// writing ~/.whycavalry/script.js'],['dim','// osascript → Scripts menu'],['sys','Script executed successfully'],['ai','Fatto in 2.1s. Vuoi velocizzare l\'esplosione?']],
-    [['dim','// scene: "logo reveal"'],['user','"Morph fluido cerchio → quadrato, 2 secondi"'],['dim','// generating shape morph modifier...'],['dim','// ease in-out, loop: true'],['sys','Script executed successfully'],['ai','Il morph gira. "Aggiungi blur al centro del morph?" —']],
-  ];
-  let scene = 0, lineIdx = 0;
-  const tb = document.getElementById('tb');
-  function addLine() {
-    const s = scenes[scene];
-    if (lineIdx >= s.length) { scene = (scene + 1) % scenes.length; lineIdx = 0; setTimeout(() => { tb.innerHTML = ''; addLine(); }, 3500); return; }
-    const [t, txt] = s[lineIdx++];
-    const d = document.createElement('div'); d.className = 't-line';
-    const lbl = t === 'user' ? '<span class="t-user">you</span>&nbsp; ' : t === 'ai' ? '<span class="t-ai">cavalry</span> ' : t === 'sys' ? '<span class="t-sys">cavalry</span> ' : '';
-    d.innerHTML = lbl + txt;
-    if (lineIdx === s.length) d.innerHTML += '<span class="cursor"></span>';
-    tb.appendChild(d); tb.scrollTop = tb.scrollHeight;
-    setTimeout(addLine, t === 'dim' ? 270 : 560);
-  }
-  setTimeout(() => { tb.innerHTML = ''; addLine(); }, 2500);
+  /* cavalry timeline playhead */
+  (function(){
+    const head = document.getElementById('tl-head');
+    if(!head) return;
+    let frame = 0;
+    const totalFrames = 120;
+    function tick(){
+      frame = (frame + 0.4) % totalFrames;
+      head.style.left = (frame / totalFrames * 100) + '%';
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
 </script>
 </body>
 </html>
