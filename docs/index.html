@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<!--
+  WhyCavalry™ · A WhyEd Project
+  © 2026 WhyEd™ — @whyed.music
+  github.com/OfficialWhyEd/WhyCavalry · MIT License
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhyCavalry — Describe motion in words. It runs in Cavalry.</title>
+  <meta name="description" content="WhyCavalry bridges AI and Cavalry motion design. Describe animation in plain language — Claude generates the JavaScript and fires it live in your open scene. Zero copy-paste." />
+  <meta name="author" content="WhyEd — @whyed.music" />
+  <meta property="og:title" content="WhyCavalry™ — AI-native motion design · A WhyEd Project" />
+  <meta property="og:description" content="Describe motion in words → Claude generates Cavalry.js → AppleScript fires it live in your scene. Zero copy-paste. AI-native motion design." />
+  <meta property="og:image" content="https://raw.githubusercontent.com/OfficialWhyEd/WhyCavalry/main/assets/banner.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="logo.png" />
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #050c0d;
+      --surface: #081214;
+      --border:  rgba(0,180,204,0.14);
+      --teal:    #00b4cc;
+      --teal2:   #00cce5;
+      --text:    #eef2f3;
+      --dim:     #576568;
+      --sub:     #8a9ea2;
+      --mono:    'JetBrains Mono', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Satoshi', system-ui, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    body::before { content: ''; position: fixed; inset: 0; z-index: 9000; pointer-events: none; opacity: .03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 256px 256px; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 3rem; background: rgba(5,12,13,.82); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-logo { display: flex; align-items: center; gap: .75rem; font-size: 1rem; font-weight: 700; letter-spacing: -.02em; color: var(--text); text-decoration: none; }
+    .nav-logo img { height: 26px; }
+    .nav-links { display: flex; align-items: center; gap: 1rem; }
+    .nav-link { font-family: var(--mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); text-decoration: none; transition: color .2s; }
+    .nav-link:hover { color: var(--text); }
+    .btn-star { display: inline-flex; align-items: center; gap: .4rem; font-family: 'Satoshi', sans-serif; font-size: .85rem; font-weight: 700; padding: .5rem 1.1rem; border-radius: 6px; background: var(--teal); color: #050c0d; border: none; cursor: pointer; text-decoration: none; transition: background .2s, transform .1s; }
+    .btn-star:hover { background: var(--teal2); }
+
+    .hero { min-height: 100dvh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: 8rem 3rem 3rem; gap: 4rem; position: relative; overflow: hidden; }
+    .beams { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .beams svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .enter-1 { animation: slideUp .9s cubic-bezier(0.16,1,0.3,1) .05s both; }
+    .enter-2 { animation: slideUp .9s cubic-bezier(0.16,1,0.3,1) .2s both; }
+    .enter-3 { animation: slideUp .9s cubic-bezier(0.16,1,0.3,1) .35s both; }
+    .enter-4 { animation: slideUp .9s cubic-bezier(0.16,1,0.3,1) .5s both; }
+    .enter-5 { animation: fadeIn  .9s cubic-bezier(0.16,1,0.3,1) .65s both; }
+    .hero-text { max-width: 600px; position: relative; z-index: 2; }
+    .eyebrow { font-family: var(--mono); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); display: flex; gap: 2rem; margin-bottom: 2.25rem; flex-wrap: wrap; }
+    .eyebrow .signal { color: var(--teal); }
+    .dot-live { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #28c840; margin-right: .4em; animation: blink-live 2.5s ease-in-out infinite; }
+    @keyframes blink-live { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .hero-h1 { font-size: clamp(3rem, 6vw, 5.8rem); font-weight: 900; line-height: .93; letter-spacing: -.05em; margin-bottom: .12em; }
+    .hero-h1-b { font-size: clamp(3rem, 6vw, 5.8rem); font-weight: 900; line-height: .93; letter-spacing: -.05em; color: var(--sub); margin-bottom: 2rem; }
+    .hero-h1-b em { font-style: italic; color: var(--teal); }
+    .hero-sub { font-size: 1.05rem; line-height: 1.75; color: var(--sub); max-width: 460px; margin-bottom: 2.5rem; }
+    .hero-ctas { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary { display: inline-flex; align-items: center; gap: .5rem; font-family: 'Satoshi',sans-serif; font-size: .95rem; font-weight: 700; padding: .75rem 1.75rem; border-radius: 8px; background: var(--teal); color: #050c0d; border: none; cursor: pointer; text-decoration: none; transition: background .2s, transform .15s, box-shadow .2s; }
+    .btn-primary:hover { background: var(--teal2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,180,204,.25); }
+    .btn-ghost { display: inline-flex; align-items: center; gap: .5rem; font-family: 'Satoshi',sans-serif; font-size: .95rem; font-weight: 600; padding: .75rem 1.5rem; border-radius: 8px; background: transparent; color: var(--sub); border: 1px solid rgba(255,255,255,.1); cursor: pointer; text-decoration: none; transition: border-color .2s, color .2s; }
+    .btn-ghost:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+    .hero-visual { position: relative; z-index: 2; }
+    .icon-wrap { display: flex; justify-content: center; align-items: center; position: relative; margin-bottom: 2rem; }
+    .icon-glow { position: absolute; width: 220px; height: 220px; background: radial-gradient(circle, rgba(0,180,204,.22) 0%, transparent 70%); animation: breathe 5s ease-in-out infinite; }
+    @keyframes breathe { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.2);opacity:1} }
+    .icon-img { height: 100px; position: relative; z-index: 1; filter: drop-shadow(0 0 18px rgba(0,180,204,.45)); border-radius: 22px; }
+    .terminal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; font-family: var(--mono); font-size: .8rem; box-shadow: 0 24px 48px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.04); }
+    .terminal-bar { display: flex; align-items: center; gap: .5rem; padding: .7rem 1rem; background: rgba(255,255,255,.025); border-bottom: 1px solid var(--border); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r{background:#ff5f57;} .dot-y{background:#febc2e;} .dot-g{background:#28c840;}
+    .terminal-title { font-family: 'Satoshi',sans-serif; font-size:.72rem; color: var(--dim); margin-left: auto; }
+    .terminal-body { padding: 1.25rem 1.5rem; line-height: 1.85; height: 18rem; overflow: hidden; }
+    .t-user { color: var(--teal); } .t-ai { color: #c8d8da; } .t-dim { color: var(--dim); } .t-sys { color: #28c840; }
+    .t-line { margin-bottom: .1rem; }
+    .cursor { display: inline-block; width: 7px; height: 1em; background: var(--teal); vertical-align: text-bottom; animation: blink 1.1s step-end infinite; margin-left: 1px; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    section { padding: 7rem 3rem; }
+    .section-label { font-family: var(--mono); font-size: .6rem; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-bottom: .85rem; }
+    h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; letter-spacing: -.04em; line-height: 1.05; margin-bottom: 1.25rem; }
+    h2 em { font-style: normal; color: var(--teal); }
+    .lead { font-size: 1rem; line-height: 1.8; color: var(--sub); max-width: 580px; }
+
+    .screenshot-wrap { margin: 0 3rem 5rem; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(0,180,204,.06); }
+    .screenshot-wrap img { width: 100%; display: block; }
+
+    .prompts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 4rem; }
+    .prompt-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem; position: relative; overflow: hidden; transition: border-color .25s, transform .2s; }
+    .prompt-card:hover { border-color: rgba(0,180,204,.4); transform: translateY(-2px); }
+    .prompt-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,180,204,.3), transparent); }
+    .prompt-category { font-family: var(--mono); font-size: .63rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); margin-bottom: .9rem; }
+    .prompt-text { font-family: var(--mono); font-size: .8rem; color: #c8d8da; line-height: 1.6; background: rgba(0,180,204,.05); border: 1px solid rgba(0,180,204,.18); border-radius: 8px; padding: .7rem .9rem; margin-bottom: .9rem; }
+    .prompt-result { font-size: .85rem; color: var(--sub); line-height: 1.65; }
+    .prompt-card.wide { grid-column: span 2; }
+
+    .philosophy-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.25rem; margin-top: 4rem; }
+    .phil-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; transition: border-color .25s; }
+    .phil-card:hover { border-color: rgba(0,180,204,.35); }
+    .phil-card.tall { grid-row: span 2; }
+    .phil-number { font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; color: var(--teal); margin-bottom: 1.25rem; }
+    .phil-card h3 { font-size: 1.15rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: .7rem; }
+    .phil-card p { font-size: .88rem; color: var(--sub); line-height: 1.75; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; margin-top: 4rem; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .feat { padding: 1.75rem; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transition: background .2s; }
+    .feat:hover { background: rgba(0,180,204,.04); }
+    .feat:nth-child(3n) { border-right: none; }
+    .feat:nth-last-child(-n+3) { border-bottom: none; }
+    .feat-icon { font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; color: var(--teal); margin-bottom: .85rem; text-transform: uppercase; }
+    .feat h4 { font-size: .92rem; font-weight: 700; margin-bottom: .35rem; }
+    .feat p { font-size: .82rem; color: var(--sub); line-height: 1.65; }
+    code { font-family: var(--mono); font-size: .85em; color: var(--sub); }
+
+    .arch-stats { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 2.5rem; }
+    .arch-stat { flex: 1; padding: 1.5rem 2rem; border-right: 1px solid var(--border); }
+    .arch-stat:last-child { border-right: none; }
+    .arch-num { display: block; font-size: 2.2rem; font-weight: 900; letter-spacing: -.05em; color: var(--text); line-height: 1; }
+    .arch-unit { font-family: var(--mono); font-size: .62rem; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); margin-top: .3rem; display: block; }
+
+    .marquee-wrap { overflow: hidden; position: relative; margin-top: 2.5rem; }
+    .marquee-wrap::before,.marquee-wrap::after { content: ''; position: absolute; top: 0; bottom: 0; width: 5rem; z-index: 2; pointer-events: none; }
+    .marquee-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
+    .marquee-wrap::after  { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
+    .features-track { display: flex; gap: 1rem; animation: marquee 34s linear infinite; width: max-content; }
+    .features-track:hover { animation-play-state: paused; }
+    @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    .feature-badge { display: flex; align-items: center; gap: .55rem; padding: .5rem 1.1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; font-family: 'Satoshi',sans-serif; font-size: .8rem; font-weight: 600; white-space: nowrap; color: var(--sub); transition: border-color .2s, color .2s; }
+    .feature-badge:hover { border-color: rgba(0,180,204,.4); color: var(--text); }
+    .fb-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+
+    .manifesto-section { padding: 8rem 3rem; position: relative; overflow: hidden; }
+    .manifesto-section::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 60%, rgba(0,180,204,.05) 0%, transparent 65%); pointer-events: none; }
+    .manifesto-inner { max-width: 860px; margin: 0 auto; }
+    .manifesto-label { font-family: var(--mono); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); margin-bottom: 2.5rem; display: block; }
+    .manifesto-text { font-size: clamp(1.6rem, 3.5vw, 2.6rem); font-weight: 700; line-height: 1.3; letter-spacing: -.03em; color: var(--text); margin-bottom: 2.5rem; }
+    .manifesto-text em { font-style: normal; color: var(--sub); font-weight: 400; }
+    .manifesto-sub { font-size: 1rem; color: var(--sub); line-height: 1.8; max-width: 580px; margin-bottom: 3rem; }
+
+    .cta-section { padding: 6rem 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
+    .cta-text h2 { margin-bottom: 1rem; } .cta-text .lead { margin-bottom: 2rem; }
+    .cta-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .cta-stats { display: flex; flex-direction: column; gap: 2rem; }
+    .stat-item { border-top: 1px solid var(--border); padding-top: 1.5rem; }
+    .stat-num { font-size: 2.8rem; font-weight: 900; letter-spacing: -.05em; color: var(--text); line-height: 1; }
+    .stat-num span { color: var(--teal); }
+    .stat-label { font-family: var(--mono); font-size: .7rem; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); margin-top: .35rem; }
+
+    footer { padding: 2.5rem 3rem; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .footer-left { font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+    .footer-left a { color: var(--teal); text-decoration: none; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-link { font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); text-decoration: none; transition: color .2s; }
+    .footer-link:hover { color: var(--text); }
+
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s cubic-bezier(0.16,1,0.3,1), transform .7s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-d1{transition-delay:.1s} .reveal-d2{transition-delay:.2s} .reveal-d3{transition-delay:.3s}
+    .prompts-grid .prompt-card { opacity:0; transform:translateY(18px); transition:opacity .6s cubic-bezier(0.16,1,0.3,1),transform .6s cubic-bezier(0.16,1,0.3,1); }
+    .prompts-grid.stagger-go .prompt-card:nth-child(1){opacity:1;transform:none;transition-delay:.04s}
+    .prompts-grid.stagger-go .prompt-card:nth-child(2){opacity:1;transform:none;transition-delay:.12s}
+    .prompts-grid.stagger-go .prompt-card:nth-child(3){opacity:1;transform:none;transition-delay:.20s}
+    .prompts-grid.stagger-go .prompt-card:nth-child(4){opacity:1;transform:none;transition-delay:.28s}
+    .prompts-grid.stagger-go .prompt-card:nth-child(5){opacity:1;transform:none;transition-delay:.36s}
+    .prompts-grid.stagger-go .prompt-card:nth-child(6){opacity:1;transform:none;transition-delay:.44s}
+    .philosophy-grid .phil-card { opacity:0; transform:translateY(18px); transition:opacity .6s cubic-bezier(0.16,1,0.3,1),transform .6s cubic-bezier(0.16,1,0.3,1); }
+    .philosophy-grid.stagger-go .phil-card:nth-child(1){opacity:1;transform:none;transition-delay:.04s}
+    .philosophy-grid.stagger-go .phil-card:nth-child(2){opacity:1;transform:none;transition-delay:.12s}
+    .philosophy-grid.stagger-go .phil-card:nth-child(3){opacity:1;transform:none;transition-delay:.20s}
+    .philosophy-grid.stagger-go .phil-card:nth-child(4){opacity:1;transform:none;transition-delay:.28s}
+    .philosophy-grid.stagger-go .phil-card:nth-child(5){opacity:1;transform:none;transition-delay:.36s}
+    .features-grid .feat { opacity:0; transform:translateY(18px); transition:opacity .6s cubic-bezier(0.16,1,0.3,1),transform .6s cubic-bezier(0.16,1,0.3,1); }
+    .features-grid.stagger-go .feat:nth-child(1){opacity:1;transform:none;transition-delay:.04s}
+    .features-grid.stagger-go .feat:nth-child(2){opacity:1;transform:none;transition-delay:.12s}
+    .features-grid.stagger-go .feat:nth-child(3){opacity:1;transform:none;transition-delay:.20s}
+    .features-grid.stagger-go .feat:nth-child(4){opacity:1;transform:none;transition-delay:.28s}
+    .features-grid.stagger-go .feat:nth-child(5){opacity:1;transform:none;transition-delay:.36s}
+    .features-grid.stagger-go .feat:nth-child(6){opacity:1;transform:none;transition-delay:.44s}
+    .arch-stats .arch-stat { opacity:0; transform:translateY(14px); transition:opacity .55s cubic-bezier(0.16,1,0.3,1),transform .55s cubic-bezier(0.16,1,0.3,1); }
+    .arch-stats.stagger-go .arch-stat:nth-child(1){opacity:1;transform:none;transition-delay:.05s}
+    .arch-stats.stagger-go .arch-stat:nth-child(2){opacity:1;transform:none;transition-delay:.13s}
+    .arch-stats.stagger-go .arch-stat:nth-child(3){opacity:1;transform:none;transition-delay:.21s}
+    .arch-stats.stagger-go .arch-stat:nth-child(4){opacity:1;transform:none;transition-delay:.29s}
+
+    @media(max-width:900px){
+      nav{padding:1rem 1.5rem} .nav-links .nav-link{display:none}
+      .hero{grid-template-columns:1fr;padding:7rem 1.5rem 3rem;gap:3rem} .hero-visual{order:-1}
+      section{padding:4rem 1.5rem} .screenshot-wrap{margin:0 1.5rem 3rem}
+      .philosophy-grid{grid-template-columns:1fr} .features-grid{grid-template-columns:1fr 1fr}
+      .features-grid .feat:nth-child(2n){border-right:none} .features-grid .feat:nth-child(3n){border-right:1px solid var(--border)}
+      .prompts-grid{grid-template-columns:1fr} .prompt-card.wide{grid-column:span 1}
+      .cta-section{grid-template-columns:1fr;gap:3rem}
+      .arch-stats{flex-direction:column} .arch-stat{border-right:none;border-bottom:1px solid var(--border)} .arch-stat:last-child{border-bottom:none}
+      footer{flex-direction:column;gap:1.5rem;text-align:center}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="https://github.com/OfficialWhyEd/WhyCavalry">
+    <img src="logo.png" alt="WhyCavalry" /> WhyCavalry
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="https://github.com/OfficialWhyEd/WhyCavalry">GitHub</a>
+    <a class="nav-link" href="https://discord.gg/cQQckfnN">Discord</a>
+    <a class="nav-link" href="https://instagram.com/whyed.music">Instagram</a>
+    <a class="btn-star" href="https://github.com/OfficialWhyEd/WhyCavalry/stargazers">Star on GitHub</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="beams">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="none">
+      <defs><radialGradient id="g1" cx="20%" cy="50%" r="50%"><stop offset="0%" stop-color="#00b4cc" stop-opacity="0.06"/><stop offset="100%" stop-color="#00b4cc" stop-opacity="0"/></radialGradient></defs>
+      <rect width="1440" height="900" fill="url(#g1)"/>
+    </svg>
+  </div>
+  <div class="hero-text">
+    <div class="eyebrow enter-1">
+      <span><span class="dot-live"></span><span class="signal">whycavalry</span></span>
+      <span>macOS only</span><span>Cavalry required</span>
+    </div>
+    <h1 class="hero-h1 enter-2">Describe motion.</h1>
+    <h1 class="hero-h1-b enter-3"><em>It runs in Cavalry.</em></h1>
+    <p class="hero-sub enter-4">Claude generates the Cavalry JavaScript from your words and fires it live in your open scene via AppleScript. No copy-paste. No context switching. Words become animation.</p>
+    <div class="hero-ctas enter-4">
+      <a class="btn-primary" href="https://github.com/OfficialWhyEd/WhyCavalry">View on GitHub</a>
+      <a class="btn-ghost" href="https://discord.gg/cQQckfnN">Join Discord</a>
+    </div>
+  </div>
+  <div class="hero-visual enter-5">
+    <div class="icon-wrap">
+      <div class="icon-glow"></div>
+      <img class="icon-img" src="logo.png" alt="WhyCavalry" />
+    </div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+        <span class="terminal-title">whycavalry — ai bridge</span>
+      </div>
+      <div class="terminal-body" id="tb">
+        <div class="t-line t-dim">// cavalry open, scene: "Intro animation"</div>
+        <div class="t-line" style="margin-top:.5rem"><span class="t-user">you</span>&nbsp; "Cerchi che esplodono dal centro, colori pastello, loop"</div>
+        <div class="t-line t-dim">// claude-cli generating cavalry.js...</div>
+        <div class="t-line t-dim">// writing to ~/.whycavalry/script.js</div>
+        <div class="t-line t-dim">// osascript → Cavalry Scripts menu</div>
+        <div class="t-line" style="margin-top:.5rem"><span class="t-sys">cavalry</span> Script executed successfully</div>
+        <div class="t-line" style="margin-top:.5rem"><span class="t-ai">whycavalry</span> "Fatto in 2.1s. Vuoi velocizzare l'esplosione?<span class="cursor"></span>"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="screenshot-wrap reveal">
+  <img src="screenshot.png" alt="WhyCavalry UI" loading="lazy" onerror="this.parentElement.style.display='none'" />
+</div>
+
+<section>
+  <p class="section-label reveal">capabilities</p>
+  <h2 class="reveal">Describe it. <em>Watch it move.</em></h2>
+  <p class="lead reveal reveal-d1">The full Cavalry.js API — shapes, modifiers, expressions, connectors, timing — all accessible in plain language.</p>
+  <div class="prompts-grid">
+    <div class="prompt-card">
+      <div class="prompt-category">Particles</div>
+      <div class="prompt-text">"Cerchi che esplodono dal centro, colori pastello, loop infinito"</div>
+      <div class="prompt-result">Claude generates particle emitter with pastel color array, radial velocity, loop timing. Fires in Cavalry in 2.3s.</div>
+    </div>
+    <div class="prompt-card">
+      <div class="prompt-category">Typography</div>
+      <div class="prompt-text">"Testo 'Hello' che entra con spring physics da sinistra"</div>
+      <div class="prompt-result">Text layer with spring easing on X position. Overshoot and settle in 0.6s. Live in scene immediately.</div>
+    </div>
+    <div class="prompt-card">
+      <div class="prompt-category">Morphing</div>
+      <div class="prompt-text">"Morph fluido tra cerchio e quadrato, 2 secondi, loop"</div>
+      <div class="prompt-result">Shape morph modifier between circle and rectangle paths. Ease in/out, seamless loop. No manual path editing.</div>
+    </div>
+    <div class="prompt-card">
+      <div class="prompt-category">Color</div>
+      <div class="prompt-text">"Sfondo che va da teal a nero in 3 secondi, sinusoidale"</div>
+      <div class="prompt-result">Background color animated with sine wave expression. Custom duration and color stops. Applied instantly.</div>
+    </div>
+    <div class="prompt-card">
+      <div class="prompt-category">Iteration</div>
+      <div class="prompt-text">"Rendi l'esplosione 30% più veloce e aggiungi un flash bianco"</div>
+      <div class="prompt-result">Claude reads the current script from context, modifies timing and adds a flash layer. Runs immediately in Cavalry.</div>
+    </div>
+    <div class="prompt-card wide">
+      <div class="prompt-category">Complex scene</div>
+      <div class="prompt-text">"Crea un logo reveal: il logo entra dall'alto, le lettere si separano e poi si riuniscono con rimbalzo, poi la scena fa un flash e si stabilizza"</div>
+      <div class="prompt-result">Multi-step sequence: layer animation, character-level timing with stagger, spring physics per character, flash overlay with opacity keyframes. Claude builds the full scene structure and fires it — no manual keyframing.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="section-label reveal">philosophy</p>
+  <h2 class="reveal">Motion without <em>friction.</em></h2>
+  <p class="lead reveal reveal-d1">The clipboard is not a workflow. WhyCavalry eliminates every step between idea and animation.</p>
+  <div class="philosophy-grid">
+    <div class="phil-card tall">
+      <div class="phil-number">01</div>
+      <h3>Zero copy-paste</h3>
+      <p>The standard workflow: write prompt in ChatGPT → copy → switch to Cavalry → paste into Scripts → run. WhyCavalry eliminates every step after the first sentence.</p>
+      <br/><p>The file bridge writes to <code>~/.whycavalry/</code>. AppleScript triggers Cavalry's Scripts menu. You never touch the clipboard. You never switch context. The animation appears while you are still looking at the chat.</p>
+    </div>
+    <div class="phil-card">
+      <div class="phil-number">02</div>
+      <h3>Cavalry native</h3>
+      <p>Claude knows the full Cavalry.js API — shapes, modifiers, expressions, connectors, timing functions. Not a wrapper. Not a prompt template.</p>
+    </div>
+    <div class="phil-card">
+      <div class="phil-number">03</div>
+      <h3>Conversation memory</h3>
+      <p>The sidebar tracks all sessions. "Make it faster" works because Claude has the previous script in context. Iterative motion design.</p>
+    </div>
+    <div class="phil-card">
+      <div class="phil-number">04</div>
+      <h3>Real-time execution</h3>
+      <p>Script lands in Cavalry and runs immediately. Feedback loop under 3 seconds. Iterate faster than manual keyframing.</p>
+    </div>
+    <div class="phil-card">
+      <div class="phil-number">05</div>
+      <h3>Zero API cost</h3>
+      <p>Claude Code CLI runs on Claude Pro subscription. No API key. No per-request billing. Use it all day.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <p class="section-label reveal">architecture</p>
+  <h2 class="reveal">How the <em>bridge works.</em></h2>
+  <p class="lead reveal reveal-d1">Electron app → Claude Code CLI → file bridge → AppleScript → Cavalry Scripts menu. One direction. Zero latency for the human.</p>
+  <div class="arch-stats">
+    <div class="arch-stat"><span class="arch-num">&lt;3</span><span class="arch-unit">seconds to execution</span></div>
+    <div class="arch-stat"><span class="arch-num">0</span><span class="arch-unit">copy-paste steps</span></div>
+    <div class="arch-stat"><span class="arch-num">100%</span><span class="arch-unit">Cavalry.js API</span></div>
+    <div class="arch-stat"><span class="arch-num">0</span><span class="arch-unit">API key needed</span></div>
+  </div>
+</section>
+
+<section>
+  <p class="section-label reveal">technical</p>
+  <h2 class="reveal">Under the <em>hood.</em></h2>
+  <div class="features-grid">
+    <div class="feat"><div class="feat-icon">electron</div><h4>Electron + Node.js</h4><p>Native macOS app. Dark UI, conversation sidebar, session history. Launches as a standalone app or from the dock.</p></div>
+    <div class="feat"><div class="feat-icon">ai</div><h4>Claude Code CLI</h4><p><code>claude --print</code> for each generation. Claude has full context of the Cavalry.js API and your conversation history.</p></div>
+    <div class="feat"><div class="feat-icon">bridge</div><h4>File bridge</h4><p>Generated script written to <code>~/.whycavalry/script.js</code>. Atomic write ensures Cavalry always reads a complete file.</p></div>
+    <div class="feat"><div class="feat-icon">osascript</div><h4>AppleScript trigger</h4><p>osascript tells Cavalry to run the script via its Scripts menu. No plugin required. Works with any Cavalry version that supports scripting.</p></div>
+    <div class="feat"><div class="feat-icon">context</div><h4>Conversation history</h4><p>Sidebar stores all past sessions. Reference previous scripts, refine animations, build on past work without restarting.</p></div>
+    <div class="feat"><div class="feat-icon">prereq</div><h4>Prerequisites</h4><p>Cavalry installed and open with an active scene. Claude Code CLI authenticated. That is all.</p></div>
+  </div>
+</section>
+
+<section style="padding:4rem 3rem">
+  <p class="section-label reveal">motion vocabulary</p>
+  <h2 class="reveal">Everything you can <em>describe.</em></h2>
+  <div class="marquee-wrap reveal reveal-d1">
+    <div class="features-track">
+      <div class="feature-badge"><span class="fb-dot"></span>particle systems</div>
+      <div class="feature-badge"><span class="fb-dot"></span>shape morphing</div>
+      <div class="feature-badge"><span class="fb-dot"></span>spring physics</div>
+      <div class="feature-badge"><span class="fb-dot"></span>text animation</div>
+      <div class="feature-badge"><span class="fb-dot"></span>color gradients</div>
+      <div class="feature-badge"><span class="fb-dot"></span>loop control</div>
+      <div class="feature-badge"><span class="fb-dot"></span>easing curves</div>
+      <div class="feature-badge"><span class="fb-dot"></span>layer stagger</div>
+      <div class="feature-badge"><span class="fb-dot"></span>expression scripting</div>
+      <div class="feature-badge"><span class="fb-dot"></span>connectors</div>
+      <div class="feature-badge"><span class="fb-dot"></span>timing functions</div>
+      <div class="feature-badge"><span class="fb-dot"></span>modifiers</div>
+      <div class="feature-badge"><span class="fb-dot"></span>logo reveals</div>
+      <div class="feature-badge"><span class="fb-dot"></span>title sequences</div>
+      <div class="feature-badge"><span class="fb-dot"></span>zero copy-paste</div>
+      <div class="feature-badge"><span class="fb-dot"></span>particle systems</div>
+      <div class="feature-badge"><span class="fb-dot"></span>shape morphing</div>
+      <div class="feature-badge"><span class="fb-dot"></span>spring physics</div>
+      <div class="feature-badge"><span class="fb-dot"></span>text animation</div>
+      <div class="feature-badge"><span class="fb-dot"></span>color gradients</div>
+      <div class="feature-badge"><span class="fb-dot"></span>loop control</div>
+      <div class="feature-badge"><span class="fb-dot"></span>easing curves</div>
+      <div class="feature-badge"><span class="fb-dot"></span>layer stagger</div>
+      <div class="feature-badge"><span class="fb-dot"></span>expression scripting</div>
+      <div class="feature-badge"><span class="fb-dot"></span>connectors</div>
+      <div class="feature-badge"><span class="fb-dot"></span>timing functions</div>
+      <div class="feature-badge"><span class="fb-dot"></span>modifiers</div>
+      <div class="feature-badge"><span class="fb-dot"></span>logo reveals</div>
+      <div class="feature-badge"><span class="fb-dot"></span>title sequences</div>
+      <div class="feature-badge"><span class="fb-dot"></span>zero copy-paste</div>
+    </div>
+  </div>
+</section>
+
+<section class="manifesto-section">
+  <div class="manifesto-inner">
+    <span class="manifesto-label reveal">manifesto</span>
+    <div class="manifesto-text reveal reveal-d1">
+      The clipboard is a symptom.<br/>
+      <em>Context switching is the real problem.</em><br/>
+      Motion should flow from thought to screen.
+    </div>
+    <p class="manifesto-sub reveal reveal-d2">WhyCavalry is not an AI plugin. It is a bridge that makes AI invisible — you stay in the creative flow, the animation appears, the conversation continues. No switching. No pasting. No interruption.</p>
+    <div class="hero-ctas reveal reveal-d3">
+      <a class="btn-primary" href="https://github.com/OfficialWhyEd/WhyCavalry">Star on GitHub</a>
+      <a class="btn-ghost" href="https://github.com/OfficialWhyEd/WhyCavalry/issues">Open an issue</a>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-text reveal">
+    <p class="section-label">get started</p>
+    <h2>Open Cavalry. <em>Start describing.</em></h2>
+    <p class="lead">Install, open Cavalry with a scene, run WhyCavalry, and type. The first animation runs in under 30 seconds from setup.</p>
+    <div class="cta-buttons">
+      <a class="btn-primary" href="https://github.com/OfficialWhyEd/WhyCavalry">View on GitHub</a>
+      <a class="btn-ghost" href="https://discord.gg/cQQckfnN">Join Discord</a>
+    </div>
+  </div>
+  <div class="cta-stats reveal reveal-d2">
+    <div class="stat-item"><div class="stat-num">&lt;<span>3</span>s</div><div class="stat-label">description to execution</div></div>
+    <div class="stat-item"><div class="stat-num"><span>0</span></div><div class="stat-label">copy-paste steps</div></div>
+    <div class="stat-item"><div class="stat-num"><span>100%</span></div><div class="stat-label">Cavalry.js API coverage</div></div>
+    <div class="stat-item"><div class="stat-num"><span>0</span></div><div class="stat-label">Anthropic API key needed</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-left">WhyCavalry™ &mdash; a <a href="https://github.com/OfficialWhyEd">WhyEd project</a> &mdash; MIT License</div>
+  <div class="footer-links">
+    <a class="footer-link" href="https://github.com/OfficialWhyEd/WhyCavalry">GitHub</a>
+    <a class="footer-link" href="https://discord.gg/cQQckfnN">Discord</a>
+    <a class="footer-link" href="https://instagram.com/whyed.music">Instagram</a>
+    <a class="footer-link" href="https://github.com/OfficialWhyEd">@whyed</a>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(e => {
+    e.forEach(x => {
+      if (x.isIntersecting) {
+        x.target.classList.add('visible');
+        if (['prompts-grid','philosophy-grid','features-grid','arch-stats'].some(c => x.target.classList.contains(c)))
+          x.target.classList.add('stagger-go');
+        io.unobserve(x.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal, .prompts-grid, .philosophy-grid, .features-grid, .arch-stats').forEach(el => io.observe(el));
+
+  const scenes = [
+    [['dim','// cavalry open, scene active'],['user','"Cerchi che esplodono dal centro, pastello, loop"'],['dim','// claude-cli generating cavalry.js...'],['dim','// writing ~/.whycavalry/script.js'],['dim','// osascript → Scripts menu'],['sys','Script executed successfully'],['ai','Fatto in 2.1s. Vuoi velocizzare l\'esplosione?']],
+    [['dim','// scene: "logo reveal"'],['user','"Morph fluido cerchio → quadrato, 2 secondi"'],['dim','// generating shape morph modifier...'],['dim','// ease in-out, loop: true'],['sys','Script executed successfully'],['ai','Il morph gira. "Aggiungi blur al centro del morph?" —']],
+  ];
+  let scene = 0, lineIdx = 0;
+  const tb = document.getElementById('tb');
+  function addLine() {
+    const s = scenes[scene];
+    if (lineIdx >= s.length) { scene = (scene + 1) % scenes.length; lineIdx = 0; setTimeout(() => { tb.innerHTML = ''; addLine(); }, 3500); return; }
+    const [t, txt] = s[lineIdx++];
+    const d = document.createElement('div'); d.className = 't-line';
+    const lbl = t === 'user' ? '<span class="t-user">you</span>&nbsp; ' : t === 'ai' ? '<span class="t-ai">cavalry</span> ' : t === 'sys' ? '<span class="t-sys">cavalry</span> ' : '';
+    d.innerHTML = lbl + txt;
+    if (lineIdx === s.length) d.innerHTML += '<span class="cursor"></span>';
+    tb.appendChild(d); tb.scrollTop = tb.scrollHeight;
+    setTimeout(addLine, t === 'dim' ? 270 : 560);
+  }
+  setTimeout(() => { tb.innerHTML = ''; addLine(); }, 2500);
+</script>
+</body>
+</html>
